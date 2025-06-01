@@ -1,1 +1,33 @@
-# aviationstack.pyimport requestsimport osfrom datetime import datetime, timedelta, timezonefrom dateutil import parserfrom dotenv import load_dotenvload_dotenv()API_KEY = os.getenv("AVIATIONSTACK_API_KEY")BASE_URL = "http://api.aviationstack.com/v1/flights"'''def get_live_flights(limit=5, date=None, status=None, departure=None, arrival=None, filter_by_time=True):    url = "http://api.aviationstack.com/v1/flights"    params = {        "access_key": API_KEY,        "limit": limit    }    if date:        params["flight_date"] = date    if status:        params["flight_status"] = status    response = requests.get(url, params=params)    data = response.json()    print("\U0001F525 RAW API DATA:")    print(data)    now = datetime.now(timezone.utc)    window_start = now - timedelta(hours=2)    window_end = now + timedelta(hours=4)    flights = []    for flight in data.get("data", []):        dep_sched = flight.get("departure", {}).get("scheduled")        arr_sched = flight.get("arrival", {}).get("scheduled")        if filter_by_time:            try:                if dep_sched:                    sched_time = parser.isoparse(dep_sched)                    if not (window_start <= sched_time <= window_end):                        continue            except Exception as e:                continue        dep_airport = (flight.get("departure", {}).get("airport") or "").lower()        arr_airport = (flight.get("arrival", {}).get("airport") or "").lower()        if departure and departure.lower() not in dep_airport:            continue        if arrival and arrival.lower() not in arr_airport:            continue        flights.append({            "callsign": flight.get("flight", {}).get("iata"),            "airline": flight.get("airline", {}).get("name") or "empty",            "departure": flight.get("departure", {}).get("airport"),            "arrival": flight.get("arrival", {}).get("airport"),            "status": flight.get("flight_status"),            "delay": flight.get("departure", {}).get("delay"),            "departure_time": dep_sched,            "arrival_time": arr_sched        })    return flights'''def get_flight_by_number(flight_number: str):    params = {        "access_key": API_KEY,        "flight_iata": flight_number    }    response = requests.get(BASE_URL, params=params)    if response.status_code == 200:        data = response.json()        flights = data.get("data", [])        if flights:            flight = flights[0]            return {                "callsign": flight["flight"].get("iata"),                "airline": flight["airline"].get("name"),                "departure": flight["departure"].get("airport"),                "arrival": flight["arrival"].get("airport"),                "status": flight.get("flight_status"),                "delay": flight["departure"].get("delay"),                "departure_time": flight["departure"].get("scheduled"),                "arrival_time": flight["arrival"].get("scheduled")            }    return None
+import requests
+import os
+from datetime import datetime, timedelta, timezone
+from dateutil import parser
+from dotenv import load_dotenv
+
+load_dotenv()
+API_KEY = os.getenv("AVIATIONSTACK_API_KEY")
+BASE_URL = "http://api.aviationstack.com/v1/flights"
+
+def get_flight_by_number(flight_number: str):
+    params = {
+        "access_key": API_KEY,
+        "flight_iata": flight_number
+    }
+    response = requests.get(BASE_URL, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        flights = data.get("data", [])
+        if flights:
+            flight = flights[0]
+            return {
+                "callsign": flight["flight"].get("iata"),
+                "airline": flight["airline"].get("name"),
+                "departure": flight["departure"].get("airport"),
+                "arrival": flight["arrival"].get("airport"),
+                "status": flight.get("flight_status"),
+                "delay": flight["departure"].get("delay"),
+                "departure_time": flight["departure"].get("scheduled"),
+                "arrival_time": flight["arrival"].get("scheduled")
+            }
+    return None
+
