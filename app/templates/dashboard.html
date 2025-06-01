@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flight Tracker Dashboard</title>
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 2rem;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 0.7rem 1.5rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .flight-result {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+        }
+
+        .flight-result h3 {
+            margin-top: 0;
+        }
+
+        .flight-info {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Flight Tracker</h1>
+
+    <form method="get" action="/flights/by_number">
+        <label for="flight_number">Enter Flight Number (e.g., TK1705)</label>
+        <input type="text" id="flight_number" name="flight_number" placeholder="Flight Number" required>
+        <button type="submit">Track Flight</button>
+    </form>
+
+    {% if result %}
+    <div class="flight-result">
+        <h3>Flight Information</h3>
+        <p class="flight-info"><strong>Callsign:</strong> {{ result.callsign or "N/A" }}</p>
+        <p class="flight-info"><strong>Airline:</strong> {{ result.airline or "N/A" }}</p>
+        <p class="flight-info"><strong>Status:</strong> {{ result.status or "N/A" }}</p>
+        <p class="flight-info"><strong>Departure:</strong> {{ result.departure or "N/A" }}</p>
+        <p class="flight-info"><strong>Departure Time:</strong> {{ result.departure_time or "N/A" }}</p>
+        <p class="flight-info"><strong>Arrival:</strong> {{ result.arrival or "N/A" }}</p>
+        <p class="flight-info"><strong>Arrival Time:</strong> {{ result.arrival_time or "N/A" }}</p>
+        <p class="flight-info"><strong>Delay:</strong> {{ result.delay or "N/A" }}</p>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>
